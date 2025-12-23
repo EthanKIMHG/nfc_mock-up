@@ -1,0 +1,48 @@
+.holo-card {
+  perspective: 2000px;
+  transform-style: preserve-3d;
+  background: black;
+  box-shadow: 0 0 50px rgba(163, 230, 53, 0.1);
+}
+
+.holo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 60%,
+      transparent 100%);
+  z-index: 2;
+  background-size: 200% 200%;
+  animation: shine 3s infinite linear;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.holo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(163, 230, 53, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163, 230, 53, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% 200%;
+  }
+
+  100% {
+    background-position: -200% -200%;
+  }
+}
