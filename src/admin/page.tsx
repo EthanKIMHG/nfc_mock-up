@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTicketContext } from "@/context/TicketContext";
 import { ArrowRight, Clock, ScanLine, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTicketContext } from "../context/TicketContextTypes";
 
 // Mock Data for Logs
 const RECENT_LOGS = [

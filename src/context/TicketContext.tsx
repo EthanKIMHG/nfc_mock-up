@@ -1,11 +1,5 @@
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-
-interface TicketContextType {
-  enteredCount: number;
-  incrementEntered: () => void;
-}
-
-const TicketContext = createContext<TicketContextType | undefined>(undefined);
+import { type ReactNode, useEffect, useState } from 'react';
+import { TicketContext } from './TicketContextTypes';
 
 export function TicketProvider({ children }: { children: ReactNode }) {
   const [enteredCount, setEnteredCount] = useState<number>(() => {
@@ -30,12 +24,4 @@ export function TicketProvider({ children }: { children: ReactNode }) {
       {children}
     </TicketContext.Provider>
   );
-}
-
-export function useTicketContext() {
-  const context = useContext(TicketContext);
-  if (context === undefined) {
-    throw new Error("useTicketContext must be used within a TicketProvider");
-  }
-  return context;
 }
