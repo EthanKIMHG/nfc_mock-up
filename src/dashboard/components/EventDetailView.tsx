@@ -1,55 +1,20 @@
-import { ArrowLeft, Clock, ShoppingBag, Map, TrendingUp } from "lucide-react";
+import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { EVENTS, ANALYTICS } from "../data";
 import { AIReportView } from "./AIReportView";
 import { CompletedEventDetail } from "./CompletedEventDetail";
 import { FestivalMap } from "./FestivalMap";
+import { ActiveEventHeader } from "./active/ActiveEventHeader";
+import { LiveStatsSidebar } from "./active/LiveStatsSidebar";
 
 interface EventDetailViewProps {
     eventId: string;
     onBack: () => void;
 }
 
-// Helper for smooth counting
-const CountUp = ({ value }: { value: number }) => {
-    const [displayValue, setDisplayValue] = useState(value);
-
-    useEffect(() => {
-        const start = displayValue;
-        const end = value;
-        if (start === end) return;
-
-        const duration = 1000;
-        const startTime = performance.now();
-
-        const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Ease out quart
-            const ease = 1 - Math.pow(1 - progress, 4);
-
-            const current = Math.floor(start + (end - start) * ease);
-            setDisplayValue(current);
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
-        };
-
-        requestAnimationFrame(animate);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value]);
-
-    return <span>{displayValue.toLocaleString()}</span>;
-};
-
-
 export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
     const originalEvent = EVENTS.find(e => e.id === eventId);
     const [viewMode, setViewMode] = useState<"DATA" | "AI_REPORT">("DATA");
-
     const originalAnalytics = ANALYTICS[eventId];
 
     const [revenue, setRevenue] = useState(originalEvent?.revenue || 0);
@@ -105,39 +70,13 @@ export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-                <div>
-                    <button
-                        onClick={onBack}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 group"
-                    >
-                        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        Back to List
-                    </button>
-                    <h1 className="text-4xl font-black text-white tracking-tight mb-2 flex items-center gap-3">
-                        {originalEvent.name}
-                        {originalEvent.status === "ACTIVE" && (
-                            <span className="text-xs font-bold bg-red-500/20 text-red-500 px-2 py-0.5 rounded animate-pulse">LIVE</span>
-                        )}
-                    </h1>
-                    <div className="flex gap-4 text-gray-400">
-                        <span>{originalEvent.date}</span>
-                        <span>•</span>
-                        <span>{originalEvent.location}</span>
-                    </div>
-                </div>
-                <div className="text-right">
-                    <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Total Revenue</div>
-                    <div className="text-3xl font-mono text-green-400 font-bold">
-                        ₩<CountUp value={revenue} />
-                    </div>
-                    <div className="text-xs text-green-500/50 mt-1 flex justify-end items-center gap-1">
-                        <TrendingUp size={12} />
-                        Live Updates
-                    </div>
-                </div>
-            </div>
+            <ActiveEventHeader
+                eventName={originalEvent.name}
+                eventDate={originalEvent.date}
+                eventLocation={originalEvent.location}
+                onBack={onBack}
+                currentRevenue={revenue}
+            />
 
             {/* Main Grid */}
             <div className="grid grid-cols-12 gap-6 items-start">
@@ -162,64 +101,11 @@ export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
                     </div>
                 </div>
 
-                {/* Stats Sidebar */}
-                <div className="col-span-4 space-y-6">
-                    {/* Attendees Card */}
-                    <div className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6">
-                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                            <Clock size={20} className="text-blue-500" />
-                            Current Attendees
-                        </h3>
-                        <div className="text-4xl font-mono font-bold text-white mb-2">
-                            <CountUp value={attendees} />
-                        </div>
-                        <div className="w-full bg-gray-800 h-1.5 rounded-full mt-4 overflow-hidden">
-                            <motion.div
-                                className="h-full bg-blue-500"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${(attendees / originalEvent.attendees.total) * 100}%` }}
-                                transition={{ type: "spring", stiffness: 50 }}
-                            />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2 text-right">
-                            {Math.round((attendees / originalEvent.attendees.total) * 100)}% Capacity
-                        </p>
-                    </div>
-
-                    {/* Live Purchases */}
-                    <div className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6 flex-1 min-h-[300px]">
-                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                            <ShoppingBag size={20} className="text-orange-500" />
-                            Live Transactions
-                        </h3>
-                        <div className="space-y-4 overflow-hidden relative">
-                            <AnimatePresence initial={false}>
-                                {purchases.map((purchase) => (
-                                    <motion.div
-                                        key={purchase.id}
-                                        layout
-                                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10"
-                                    >
-                                        <div>
-                                            <div className="font-medium text-white text-sm">{purchase.item}</div>
-                                            <div className="text-xs text-gray-500">{purchase.time}</div>
-                                        </div>
-                                        <div className="font-mono text-green-400 text-sm">
-                                            +₩{purchase.amount.toLocaleString()}
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                            {purchases.length === 0 && (
-                                <p className="text-sm text-gray-500 text-center py-4">Waiting for transitions...</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <LiveStatsSidebar
+                    currentAttendees={attendees}
+                    totalAttendees={originalEvent.attendees.total}
+                    purchases={purchases}
+                />
             </div>
         </div>
     );
