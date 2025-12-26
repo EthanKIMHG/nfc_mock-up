@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
 import type { AnalyticsData } from "@/dashboard/data";
+import { motion } from "framer-motion";
+import { useLanguage } from "../../../context/LanguageContext";
 
 interface EventChartsProps {
     chartData: AnalyticsData['chartData'];
@@ -7,6 +8,8 @@ interface EventChartsProps {
 }
 
 export function EventCharts({ chartData, revenue }: EventChartsProps) {
+    const { t } = useLanguage();
+
     if (!chartData) return null;
 
     const maxBeer = Math.max(...chartData.beerSales.map(b => b.count));
@@ -17,13 +20,13 @@ export function EventCharts({ chartData, revenue }: EventChartsProps) {
 
             {/* Beer Brand Ranking */}
             <div className="col-span-8 bg-zinc-900/50 border border-white/10 rounded-3xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">🍺 Best Selling Brands</h3>
+                <h3 className="text-xl font-bold text-white mb-6">{t('dash.best_selling')}</h3>
                 <div className="space-y-5">
                     {chartData.beerSales.map((item, index) => (
                         <div key={item.name} className="relative">
                             <div className="flex justify-between text-sm mb-1.5 z-10 relative px-1">
                                 <span className="font-semibold text-white">{item.name}</span>
-                                <span className="font-mono text-gray-400">{item.count.toLocaleString()} sold</span>
+                                <span className="font-mono text-gray-400">{item.count.toLocaleString()} {t('dash.sold')}</span>
                             </div>
                             <div className="h-4 bg-white/5 rounded-full overflow-hidden relative">
                                 <motion.div
@@ -42,7 +45,7 @@ export function EventCharts({ chartData, revenue }: EventChartsProps) {
 
             {/* Revenue Breakdown */}
             <div className="col-span-4 bg-zinc-900/50 border border-white/10 rounded-3xl p-8 flex flex-col">
-                <h3 className="text-xl font-bold text-white mb-6">Revenue Mix</h3>
+                <h3 className="text-xl font-bold text-white mb-6">{t('dash.revenue_mix')}</h3>
                 <div className="flex-1 flex flex-col justify-center space-y-6">
                     {chartData.revenueByCategory.map((item, index) => (
                         <div key={item.name}>
@@ -71,7 +74,7 @@ export function EventCharts({ chartData, revenue }: EventChartsProps) {
 
             {/* Hourly Traffic Curve (CSS/SVG Visualization) */}
             <div className="col-span-12 bg-zinc-900/50 border border-white/10 rounded-3xl p-8 h-[300px] flex flex-col">
-                <h3 className="text-xl font-bold text-white mb-6">Hourly Footfall</h3>
+                <h3 className="text-xl font-bold text-white mb-6">{t('dash.hourly_footfall')}</h3>
                 <div className="flex-1 flex items-end justify-between gap-4 px-4 relative">
                     {/* Grid Lines */}
                     <div className="absolute inset-0 border-b border-white/5 pointer-events-none" style={{ top: '20%' }} />

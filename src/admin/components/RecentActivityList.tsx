@@ -1,6 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowRight, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
 
 // Mock Data for Logs
 const RECENT_LOGS = [
@@ -13,11 +14,12 @@ const RECENT_LOGS = [
 
 export function RecentActivityList() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     return (
         <div className="flex-1 flex flex-col gap-4 min-h-0">
             <h2 className="text-sm font-medium text-gray-500 flex items-center gap-2 uppercase tracking-widest px-1">
-                <Clock size={12} /> Recent Activity
+                <Clock size={12} /> {t('dash.recent_activity')}
             </h2>
 
             <ScrollArea className="flex-1 -mx-2 px-2">

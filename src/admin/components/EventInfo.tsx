@@ -2,18 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import type { EventData } from "@/dashboard/data";
 import { Calendar, Info, MapPin, ShieldAlert, Ticket } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface EventInfoProps {
   event: EventData;
 }
 
 export function EventInfo({ event }: EventInfoProps) {
+  const { t } = useLanguage();
+
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <Button className="w-full gap-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white rounded-xl h-12 mt-4 transition-all">
           <Info size={16} />
-          View Event Information policy
+          {t('dashboard.view_policy')}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="bg-zinc-950/95 backdrop-blur-xl border-zinc-800 text-white max-h-[85vh]">
@@ -52,33 +55,33 @@ export function EventInfo({ event }: EventInfoProps) {
             <div className="space-y-6">
                 <div className="space-y-2">
                     <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Ticket size={18} /> Ticket Collection
+                        <Ticket size={18} /> {t('policy.ticket_collection')}
                     </h3>
                     <div className="bg-white/5 rounded-xl p-4 text-sm text-gray-300 leading-relaxed space-y-2 border-l-2 border-lime-400">
-                        <p>Tickets can be collected at the venue ticket booth.</p>
-                        <p>Please bring a valid photo ID.</p>
-                        <p className="text-gray-500 text-xs">Ticket booth opens 2 hours before the event.</p>
+                        <p>{t('policy.ticket_collection_desc')}</p>
+                        <p>{t('policy.bring_id')}</p>
+                        <p className="text-gray-500 text-xs">{t('policy.booth_open')}</p>
                     </div>
                 </div>
 
                 <div className="space-y-2">
                     <h3 className="font-bold text-lg flex items-center gap-2">
-                        <ShieldAlert size={18} /> Age Policy
+                        <ShieldAlert size={18} /> {t('policy.age_policy')}
                     </h3>
                     <div className="bg-white/5 rounded-xl p-4 text-sm text-gray-300 leading-relaxed border-l-2 border-orange-400">
-                        <p>This event is restricted to adults only.</p>
-                        <p>Entry is permitted for guests aged 19 and over.</p>
-                        <p className="text-gray-500 text-xs mt-2">Minors will not be admitted under any circumstances, even if accompanied by a guardian.</p>
+                        <p>{t('policy.adults_only')}</p>
+                        <p>{t('policy.min_age')}</p>
+                        <p className="text-gray-500 text-xs mt-2">{t('policy.no_minors')}</p>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                     <h3 className="font-bold text-lg">Important Info</h3>
+                     <h3 className="font-bold text-lg">{t('policy.important_info')}</h3>
                      <ul className="list-disc list-inside text-xs text-gray-400 space-y-1 ml-1 marker:text-lime-400">
-                        <li>Age policy follows ticket provider guidelines.</li>
-                        <li>ID may be required upon entry.</li>
-                        <li>Filming and photography subject to venue rules.</li>
-                        <li>By completing your purchase, you agree to all policies listed above.</li>
+                        <li>{t('policy.info_1')}</li>
+                        <li>{t('policy.info_2')}</li>
+                        <li>{t('policy.info_3')}</li>
+                        <li>{t('policy.info_4')}</li>
                      </ul>
                 </div>
             </div>

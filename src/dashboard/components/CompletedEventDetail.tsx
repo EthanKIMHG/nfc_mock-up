@@ -1,7 +1,8 @@
+import { getAnalytics, getEvents } from "@/dashboard/data";
 import { ArrowLeft, Sparkles } from "lucide-react";
-import { EVENTS, ANALYTICS } from "@/dashboard/data";
-import { EventSummaryCards } from "./completed/EventSummaryCards";
+import { useLanguage } from "../../context/LanguageContext";
 import { EventCharts } from "./completed/EventCharts";
+import { EventSummaryCards } from "./completed/EventSummaryCards";
 
 interface CompletedEventDetailProps {
     eventId: string;
@@ -10,8 +11,9 @@ interface CompletedEventDetailProps {
 }
 
 export function CompletedEventDetail({ eventId, onBack, onViewAIReport }: CompletedEventDetailProps) {
-    const event = EVENTS.find(e => e.id === eventId);
-    const analytics = ANALYTICS[eventId];
+    const { t, language } = useLanguage();
+    const event = getEvents(language).find(e => e.id === eventId);
+    const analytics = getAnalytics(eventId, language);
 
     if (!event || !analytics || !analytics.chartData) return <div>Data not available</div>;
 
@@ -27,7 +29,7 @@ export function CompletedEventDetail({ eventId, onBack, onViewAIReport }: Comple
                         className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 group"
                     >
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        Back to List
+                        {t('dash.back')}
                     </button>
                     <h1 className="text-4xl font-black text-white tracking-tight mb-2">{event.name}</h1>
                     <div className="flex gap-4 text-gray-400">
@@ -42,7 +44,7 @@ export function CompletedEventDetail({ eventId, onBack, onViewAIReport }: Comple
                     className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 group"
                 >
                     <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
-                    View AI Analysis
+                    {t('dash.view_ai')}
                 </button>
             </div>
 

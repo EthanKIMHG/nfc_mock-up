@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import AdminPage from "./admin/page";
+import { LanguageProvider } from "./context/LanguageContext";
 import { TicketProvider } from "./context/TicketContext";
 import HistoryPage from "./history/page";
 import ScanPage from "./scan/page";
@@ -28,17 +29,19 @@ function Layout({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <BrowserRouter>
-      <TicketProvider>
-        <Routes>
-          {/* Dashboard Routes (Full Width) */}
-          <Route path="/dashboard/*" element={<DashboardPage />} />
+      <LanguageProvider>
+        <TicketProvider>
+          <Routes>
+            {/* Dashboard Routes (Full Width) */}
+            <Route path="/dashboard/*" element={<DashboardPage />} />
 
-          {/* Mobile App Routes (Restricted Width) */}
-          <Route path="/" element={<Layout><AdminPage /></Layout>} />
-          <Route path="/scan" element={<Layout><ScanPage /></Layout>} />
-          <Route path="/history/:id" element={<Layout><HistoryPage /></Layout>} />
-        </Routes>
-      </TicketProvider>
+            {/* Mobile App Routes (Restricted Width) */}
+            <Route path="/" element={<Layout><AdminPage /></Layout>} />
+            <Route path="/scan" element={<Layout><ScanPage /></Layout>} />
+            <Route path="/history/:id" element={<Layout><HistoryPage /></Layout>} />
+          </Routes>
+        </TicketProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

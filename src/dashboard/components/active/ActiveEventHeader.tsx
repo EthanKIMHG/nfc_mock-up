@@ -1,4 +1,5 @@
 import { ArrowLeft, TrendingUp } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
 
 // Simple internal helper or assume imported. I'll keep it simple here.
 const CountUp = ({ value }: { value: number }) => <span>{value.toLocaleString()}</span>;
@@ -12,6 +13,8 @@ interface ActiveEventHeaderProps {
 }
 
 export function ActiveEventHeader({ eventName, eventDate, eventLocation, onBack, currentRevenue }: ActiveEventHeaderProps) {
+    const { t } = useLanguage();
+
     return (
         <div className="flex items-start justify-between">
             <div>
@@ -20,7 +23,7 @@ export function ActiveEventHeader({ eventName, eventDate, eventLocation, onBack,
                     className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 group"
                 >
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to List
+                    {t('dash.back')}
                 </button>
                 <h1 className="text-4xl font-black text-white tracking-tight mb-2 flex items-center gap-3">
                     {eventName}
@@ -33,13 +36,13 @@ export function ActiveEventHeader({ eventName, eventDate, eventLocation, onBack,
                 </div>
             </div>
             <div className="text-right">
-                <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Total Revenue</div>
+                <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">{t('dash.revenue')}</div>
                 <div className="text-3xl font-mono text-green-400 font-bold">
                     ₩<CountUp value={currentRevenue} />
                 </div>
                 <div className="text-xs text-green-500/50 mt-1 flex justify-end items-center gap-1">
                     <TrendingUp size={12} />
-                    Live Updates
+                    {t('dash.live_updates')}
                 </div>
             </div>
         </div>

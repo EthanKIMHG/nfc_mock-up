@@ -1,5 +1,6 @@
-import { LayoutDashboard, History, Settings, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Activity, History, LayoutDashboard, Settings } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface DashboardSidebarProps {
     activeTab: "overview" | "history" | "settings";
@@ -7,10 +8,12 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarProps) {
+    const { t } = useLanguage();
+
     const navItems = [
-        { id: "overview", label: "Overview", icon: LayoutDashboard },
-        { id: "history", label: "Event History", icon: History },
-        { id: "settings", label: "Settings", icon: Settings },
+        { id: "overview", label: t('dash.nav.overview'), icon: LayoutDashboard },
+        { id: "history", label: t('dash.nav.history'), icon: History },
+        { id: "settings", label: t('dash.nav.settings'), icon: Settings },
     ] as const;
 
     return (
@@ -20,7 +23,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                     <Activity className="text-white" size={18} />
                 </div>
                 <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-                    NFC Admin
+                    {t('dash.admin_title')}
                 </span>
             </div>
 
@@ -46,8 +49,8 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gray-800 border border-white/10" />
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white">Admin User</span>
-                        <span className="text-xs text-gray-500">Super Admin</span>
+                        <span className="text-sm font-medium text-white">{t('dash.user.name')}</span>
+                        <span className="text-xs text-gray-500">{t('dash.user.role')}</span>
                     </div>
                 </div>
             </div>

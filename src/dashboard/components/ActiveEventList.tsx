@@ -1,12 +1,14 @@
 import { ArrowRight, MapPin, Users } from "lucide-react";
-import { EVENTS } from "../data";
+import { useLanguage } from "../../context/LanguageContext";
+import { getEvents } from "../data";
 
 interface ActiveEventListProps {
     onSelectEvent: (eventId: string) => void;
 }
 
 export function ActiveEventList({ onSelectEvent }: ActiveEventListProps) {
-    const activeEvents = EVENTS.filter(e => e.status === "ACTIVE" || e.status === "UPCOMING");
+    const { language } = useLanguage();
+    const activeEvents = getEvents(language).filter(e => e.status === "ACTIVE" || e.status === "UPCOMING");
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

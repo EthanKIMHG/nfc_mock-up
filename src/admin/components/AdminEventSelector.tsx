@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Calendar, ChevronRight, MapPin, Users } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 import { EVENTS } from "../../dashboard/data";
 
 interface AdminEventSelectorProps {
@@ -7,15 +8,16 @@ interface AdminEventSelectorProps {
 }
 
 export function AdminEventSelector({ onSelect }: AdminEventSelectorProps) {
+    const { t } = useLanguage();
     const activeEvents = EVENTS.filter(e => e.status === "ACTIVE" || e.status === "UPCOMING");
 
     return (
         <div className="p-6 space-y-6">
             <header className="mb-8 mt-4">
                 <h1 className="text-3xl font-black text-white tracking-tight mb-2">
-                    Select Event
+                    {t('dash.select_event')}
                 </h1>
-                <p className="text-gray-400">Choose an event to manage entry</p>
+                <p className="text-gray-400">{t('dash.choose_event')}</p>
             </header>
 
             <div className="space-y-4">
@@ -39,7 +41,7 @@ export function AdminEventSelector({ onSelect }: AdminEventSelectorProps) {
                                     ? "bg-green-500 text-black shadow-[0_0_10px_rgba(34,197,94,0.4)]"
                                     : "bg-zinc-700 text-gray-300"
                                     }`}>
-                                    {event.status === "ACTIVE" ? "LIVE NOW" : "UPCOMING"}
+                                    {event.status === "ACTIVE" ? t('dash.live_now_badge') : t('dash.upcoming_badge')}
                                 </span>
                                 <ChevronRight className="text-gray-500 group-hover:text-white transition-colors" />
                             </div>

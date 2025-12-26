@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Zone {
     name: string;
@@ -11,6 +12,8 @@ interface FestivalMapProps {
 }
 
 export function FestivalMap({ eventId, zones }: FestivalMapProps) {
+    const { t } = useLanguage();
+
     // 1. NEON NIGHTS (Stadium Layout)
     if (eventId === "EVT-2026-001") {
         return (
@@ -22,7 +25,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 250 150 Q 400 80 550 150 L 520 250 Q 400 280 280 250 Z"
                     color="#A855F7"
-                    label="MAIN STAGE"
+                    label={t('zone.main_stage')}
                     zones={zones}
                     match="Main"
                 />
@@ -31,7 +34,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 600 200 Q 700 300 600 400 L 550 350 Q 620 300 550 250 Z"
                     color="#F97316"
-                    label="FOOD COURT"
+                    label={t('zone.food_court')}
                     zones={zones}
                     match="Food"
                 />
@@ -40,7 +43,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 200 200 Q 100 300 200 400 L 250 350 Q 180 300 250 250 Z"
                     color="#22C55E"
-                    label="CHILL ZONE"
+                    label={t('zone.chill_zone')}
                     zones={zones}
                     match="Chill"
                 />
@@ -49,7 +52,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 300 450 Q 400 500 500 450 L 500 520 Q 400 550 300 520 Z"
                     color="#3B82F6"
-                    label="MERCH STORE"
+                    label={t('zone.merch_store')}
                     zones={zones}
                     match="Merch"
                 />
@@ -68,7 +71,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 80 80 L 380 80 L 380 380 L 80 380 Z"
                     color="#3B82F6"
-                    label="DEMO ZONE A"
+                    label={t('zone.demo_zone')}
                     zones={zones}
                     match="Demo"
                 />
@@ -77,7 +80,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 420 80 L 720 80 L 720 380 L 420 380 Z"
                     color="#EF4444"
-                    label="E-SPORTS ARENA"
+                    label={t('zone.esports')}
                     zones={zones}
                     match="Arena"
                 />
@@ -86,7 +89,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 80 420 L 720 420 L 720 520 L 80 520 Z"
                     color="#EAB308"
-                    label="INDIE CORNER"
+                    label={t('zone.indie')}
                     zones={zones}
                     match="Indie"
                 />
@@ -105,7 +108,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 100 200 Q 400 150 700 200 Q 750 400 600 500 Q 400 550 200 500 Q 50 400 100 200 Z"
                     color="#4ADE80"
-                    label="PICNIC GRASS"
+                    label={t('zone.picnic')}
                     zones={zones}
                     match="Picnic"
                 />
@@ -114,7 +117,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
                 <ZonePath
                     d="M 150 520 L 650 520 L 650 580 L 150 580 Z"
                     color="#F97316"
-                    label="FOOD TRUCKS"
+                    label={t('zone.food_trucks')}
                     zones={zones}
                     match="Food"
                 />
@@ -126,7 +129,7 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
     return (
         <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl">
             <rect x="100" y="100" width="600" height="400" stroke="white" fill="none" opacity="0.1" />
-            <text x="400" y="300" textAnchor="middle" fill="white" opacity="0.5">Map Data Unavailable</text>
+            <text x="400" y="300" textAnchor="middle" fill="white" opacity="0.5">{t('dash.map_unavailable')}</text>
         </svg>
     );
 }

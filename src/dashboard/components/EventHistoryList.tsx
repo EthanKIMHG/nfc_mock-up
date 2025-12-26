@@ -1,12 +1,14 @@
 import { Calendar, ChevronRight, MapPin } from "lucide-react";
-import { EVENTS } from "../data";
+import { useLanguage } from "../../context/LanguageContext";
+import { getEvents } from "../data";
 
 interface EventHistoryListProps {
     onSelectEvent: (eventId: string) => void;
 }
 
 export function EventHistoryList({ onSelectEvent }: EventHistoryListProps) {
-    const pastEvents = EVENTS.filter(e => e.status === "COMPLETED");
+    const { language } = useLanguage();
+    const pastEvents = getEvents(language).filter(e => e.status === "COMPLETED");
 
     return (
         <div className="bg-zinc-900/50 border border-white/10 rounded-3xl overflow-hidden">

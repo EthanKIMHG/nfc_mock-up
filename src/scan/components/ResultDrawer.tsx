@@ -8,10 +8,10 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { ShieldCheck } from "lucide-react";
 import type { NFTTicket } from "@/types/ticket";
-import { useTicketContext } from "@/context/TicketContextTypes"; // Updated path since we are in components/
-import type { ScanMode } from "@/scan/types";
+import { ShieldCheck } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
+import type { ScanMode } from "../types";
 
 interface ResultDrawerProps {
     isOpen: boolean;
@@ -22,12 +22,7 @@ interface ResultDrawerProps {
 }
 
 export function ResultDrawer({ isOpen, setIsOpen, scannedData, mode, onReset }: ResultDrawerProps) {
-    const { incrementEntered } = useTicketContext();
-
-    const handleConfirm = () => {
-        if (mode === "ENTRY") incrementEntered();
-        onReset();
-    };
+    const { t } = useLanguage();
 
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -35,10 +30,10 @@ export function ResultDrawer({ isOpen, setIsOpen, scannedData, mode, onReset }: 
                 <div className="mx-auto w-full max-w-sm">
                     <DrawerHeader className="mb-4">
                         <DrawerTitle className="text-3xl font-medium text-center text-white tracking-tight">
-                            {mode === "ENTRY" ? "Access Granted" : "Payment Success"}
+                            {t('status.success')}
                         </DrawerTitle>
                         <DrawerDescription className="text-center text-gray-400 font-light">
-                            transaction confirmed.
+                            {t('dashboard.checked_in')}
                         </DrawerDescription>
                     </DrawerHeader>
 
@@ -54,9 +49,9 @@ export function ResultDrawer({ isOpen, setIsOpen, scannedData, mode, onReset }: 
 
                             {/* Transaction Info (Dynamic based on Mode) */}
                             <div className="w-full bg-white/5 rounded-xl p-4 flex justify-between items-center">
-                                <span className="text-xs text-gray-400 uppercase tracking-wider">{mode === "ENTRY" ? "Action" : "Amount"}</span>
+                                <span className="text-xs text-gray-400 uppercase tracking-wider">{mode === "ENTRY" ? t('mode.entrance') : t('mode.payment')}</span>
                                 <span className="text-lg font-bold font-mono">
-                                    {mode === "ENTRY" ? "ENTRY LOG" : "₩ 10,000"}
+                                    {mode === "ENTRY" ? "LOG" : "₩ 10,000"}
                                 </span>
                             </div>
 
@@ -72,14 +67,16 @@ export function ResultDrawer({ isOpen, setIsOpen, scannedData, mode, onReset }: 
 
                     <DrawerFooter className="gap-3">
                         <Button
-                            onClick={handleConfirm}
+                            onClick={() => {
+                                onReset();
+                            }}
                             className="w-full bg-white text-black hover:bg-gray-200 rounded-full h-14 text-base font-medium tracking-wide"
                         >
-                            Confirm
+                            {t('common.confirm')}
                         </Button>
                         <DrawerClose asChild>
                             <Button variant="ghost" onClick={onReset} className="w-full text-white/50 hover:text-white rounded-full h-12">
-                                Close
+                                {t('common.close')}
                             </Button>
                         </DrawerClose>
                     </DrawerFooter>

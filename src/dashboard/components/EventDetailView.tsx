@@ -1,6 +1,7 @@
 import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
-import { EVENTS, ANALYTICS } from "../data";
+import { useLanguage } from "../../context/LanguageContext";
+import { getAnalytics, getEvents } from "../data";
 import { AIReportView } from "./AIReportView";
 import { CompletedEventDetail } from "./CompletedEventDetail";
 import { FestivalMap } from "./FestivalMap";
@@ -13,9 +14,10 @@ interface EventDetailViewProps {
 }
 
 export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
-    const originalEvent = EVENTS.find(e => e.id === eventId);
+    const { t, language } = useLanguage();
+    const originalEvent = getEvents(language).find(e => e.id === eventId);
     const [viewMode, setViewMode] = useState<"DATA" | "AI_REPORT">("DATA");
-    const originalAnalytics = ANALYTICS[eventId];
+    const originalAnalytics = getAnalytics(eventId, language);
 
     const [revenue, setRevenue] = useState(originalEvent?.revenue || 0);
     const [attendees, setAttendees] = useState(originalEvent?.attendees.checkedIn || 0);
@@ -85,7 +87,7 @@ export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
                 <div className="col-span-8 bg-zinc-900/50 border border-white/10 rounded-3xl p-6 min-h-[500px] flex flex-col relative overflow-hidden">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 z-10 relative">
                         <Map size={20} className="text-purple-500" />
-                        Live Crowd Density Map
+                        {t('dash.density_map')}
                     </h3>
 
                     {/* Interactive SVG Map */}
@@ -96,7 +98,7 @@ export function EventDetailView({ eventId, onBack }: EventDetailViewProps) {
 
                         <p className="absolute bottom-4 right-4 text-xs text-gray-500 flex items-center gap-1 bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-white/5">
                             <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                            Updating Real-time
+                            {t('dash.updating')}
                         </p>
                     </div>
                 </div>

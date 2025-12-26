@@ -2,6 +2,7 @@ import type { NFTTicket } from "@/types/ticket";
 import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "../context/LanguageContext";
 import { ModeSwitcher } from "./components/ModeSwitcher";
 import { PayloadInspector } from "./components/PayloadInspector";
 import { ResultDrawer } from "./components/ResultDrawer";
@@ -16,7 +17,9 @@ export default function ScanPage() {
   const [scannedData, setScannedData] = useState<NFTTicket | null>(null);
   const [payload, setPayload] = useState<any>(null);
 
-  const handleScanTrigger = () => {
+    const { t } = useLanguage();
+
+    const handleScanTrigger = () => {
     // Manual State Transition Logic for Presentation
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(50);
@@ -30,13 +33,13 @@ export default function ScanPage() {
         setStatus("SIGNING");
         // Construct Payload when moving to SIGNING
         const mockPayload = {
-          device_id: mode === "ENTRY" ? "GATE-01" : "POS-01",
-          action: mode,
-          band_id: "BND-" + Math.random().toString(36).substr(2, 6),
-          ...(mode === "PAYMENT" && { amount: 10000 }),
-          timestamp: Math.floor(Date.now() / 1000),
-          nonce: Math.random().toString(36).substr(2, 8),
-          request_id: crypto.randomUUID().split('-')[0]
+            device_id: mode === "ENTRY" ? "GATE-01" : "POS-01",
+            action: mode,
+            band_id: "BND-" + Math.random().toString(36).substr(2, 6),
+            ...(mode === "PAYMENT" && { amount: 10000 }),
+            timestamp: Math.floor(Date.now() / 1000),
+            nonce: Math.random().toString(36).substr(2, 8),
+            request_id: crypto.randomUUID().split('-')[0]
         };
         setPayload(mockPayload);
         break;
@@ -48,8 +51,8 @@ export default function ScanPage() {
         setStatus("SUCCESS");
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
-        toast.success(mode === "ENTRY" ? "Entry Approved" : "Payment Successful", {
-          description: `Signature Verified. ${mode === "PAYMENT" ? "10,000 KRW deducted." : "Welcome!"}`,
+        toast.success(t('status.success'), {
+          description: `${t('scan.signature_valid')}. ${mode === "PAYMENT" ? "10,000 KRW deducted." : t('dashboard.checked_in')}`,
           icon: <ShieldCheck className="text-lime-500" />
         });
 

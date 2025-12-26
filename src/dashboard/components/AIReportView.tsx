@@ -1,5 +1,6 @@
 import { ArrowLeft, Beer, Download, FileText, TrendingUp, Users } from "lucide-react";
-import { EVENTS, ANALYTICS } from "../data";
+import { useLanguage } from "../../context/LanguageContext";
+import { getAnalytics, getEvents } from "../data";
 
 interface AIReportViewProps {
     eventId: string;
@@ -7,10 +8,11 @@ interface AIReportViewProps {
 }
 
 export function AIReportView({ eventId, onBack }: AIReportViewProps) {
-    const event = EVENTS.find(e => e.id === eventId);
-    const analytics = ANALYTICS[eventId];
+    const { t, language } = useLanguage();
+    const event = getEvents(language).find(e => e.id === eventId);
+    const analytics = getAnalytics(eventId, language);
 
-    if (!event || !analytics || !analytics.aiInsights) return <div>Report not available</div>;
+    if (!event || !analytics || !analytics.aiInsights) return <div>{t('dash.report_unavailable')}</div>;
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -29,7 +31,7 @@ export function AIReportView({ eventId, onBack }: AIReportViewProps) {
                     className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
                 >
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to List
+                    {t('dash.back')}
                 </button>
             </div>
 
@@ -44,26 +46,26 @@ export function AIReportView({ eventId, onBack }: AIReportViewProps) {
                     <div className="flex justify-between items-start">
                         <div>
                             <div className="inline-block px-3 py-1 bg-black text-white text-xs font-bold uppercase tracking-widest mb-4">
-                                NFC Admin AI Analysis
+                                {t('dash.ai_title')}
                             </div>
                             <h1 className="text-4xl font-serif font-bold text-gray-900 mb-2">
-                                Post-Event Report
+                                {t('dash.post_event_report')}
                             </h1>
                             <p className="text-gray-500 text-lg">{event.name}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm text-gray-400">Generated on</p>
+                            <p className="text-sm text-gray-400">{t('dash.generated_on')}</p>
                             <p className="font-mono font-medium">{new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-8 mt-12">
                         <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide">Total Attendees</p>
+                            <p className="text-xs text-gray-400 uppercase tracking-wide">{t('dash.total_attendees_cap')}</p>
                             <p className="text-2xl font-bold">{event.attendees.total.toLocaleString()}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide">Total Revenue</p>
+                            <p className="text-xs text-gray-400 uppercase tracking-wide">{t('dash.total_revenue_cap')}</p>
                             <p className="text-2xl font-bold">₩{event.revenue.toLocaleString()}</p>
                         </div>
                         <div>
@@ -77,7 +79,7 @@ export function AIReportView({ eventId, onBack }: AIReportViewProps) {
                 <div className="p-12 bg-gray-50/50 flex-1 relative z-10">
                     <h2 className="text-2xl font-serif font-bold mb-8 flex items-center gap-3">
                         <span className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-sans">AI</span>
-                        Key Strategic Insights
+                        {t('dash.key_insights')}
                     </h2>
 
                     <div className="space-y-6">
@@ -97,7 +99,7 @@ export function AIReportView({ eventId, onBack }: AIReportViewProps) {
                     </div>
 
                     <div className="mt-12 p-6 bg-blue-50 border border-blue-100 rounded-lg">
-                        <h4 className="font-bold text-blue-900 mb-2 text-sm uppercase">Summary</h4>
+                        <h4 className="font-bold text-blue-900 mb-2 text-sm uppercase">{t('dash.summary')}</h4>
                         <p className="text-blue-800 text-sm leading-relaxed">
                             Based on the analysis, this event showed strong engagement from the 30-40 age demographic.
                             The correlation between specific age groups and F&B consumption suggests high potential for
@@ -109,16 +111,16 @@ export function AIReportView({ eventId, onBack }: AIReportViewProps) {
                 {/* Footer / Actions */}
                 <div className="p-8 bg-gray-900 text-white flex justify-between items-center relative z-10">
                     <div className="text-xs text-gray-500">
-                        CONFIDENTIAL DOCUMENT • FOR INTERNAL USE ONLY
+                        {t('dash.confidential')}
                     </div>
                     <div className="flex gap-4">
                         <button className="flex items-center gap-2 text-sm font-medium hover:text-white/80 transition-colors">
                             <Download size={16} />
-                            Download PDF
+                            {t('dash.download_pdf')}
                         </button>
                         <button className="flex items-center gap-2 text-sm font-medium hover:text-white/80 transition-colors">
                             <FileText size={16} />
-                            Download XLS
+                            {t('dash.download_xls')}
                         </button>
                     </div>
                 </div>

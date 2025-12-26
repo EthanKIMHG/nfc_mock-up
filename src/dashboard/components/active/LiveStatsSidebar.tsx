@@ -1,5 +1,6 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Clock, ShoppingBag } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
 
 interface Purchase {
     id: string;
@@ -15,13 +16,15 @@ interface LiveStatsSidebarProps {
 }
 
 export function LiveStatsSidebar({ currentAttendees, totalAttendees, purchases }: LiveStatsSidebarProps) {
+    const { t } = useLanguage();
+
     return (
         <div className="col-span-4 space-y-6">
             {/* Attendees Card */}
             <div className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <Clock size={20} className="text-blue-500" />
-                    Current Attendees
+                    {t('dash.attendees')}
                 </h3>
                 <div className="text-4xl font-mono font-bold text-white mb-2">
                     {currentAttendees.toLocaleString()}
@@ -35,7 +38,7 @@ export function LiveStatsSidebar({ currentAttendees, totalAttendees, purchases }
                     />
                 </div>
                 <p className="text-xs text-gray-500 mt-2 text-right">
-                    {Math.round((currentAttendees / totalAttendees) * 100)}% Capacity
+                    {Math.round((currentAttendees / totalAttendees) * 100)}% {t('dash.capacity')}
                 </p>
             </div>
 
@@ -43,7 +46,7 @@ export function LiveStatsSidebar({ currentAttendees, totalAttendees, purchases }
             <div className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6 flex-1 min-h-[300px]">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <ShoppingBag size={20} className="text-orange-500" />
-                    Live Transactions
+                    {t('dash.transactions')}
                 </h3>
                 <div className="space-y-4 overflow-hidden relative">
                     <AnimatePresence initial={false}>
@@ -68,7 +71,7 @@ export function LiveStatsSidebar({ currentAttendees, totalAttendees, purchases }
                         ))}
                     </AnimatePresence>
                     {purchases.length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">Waiting for transitions...</p>
+                        <p className="text-sm text-gray-500 text-center py-4">{t('dash.waiting_tx')}</p>
                     )}
                 </div>
             </div>

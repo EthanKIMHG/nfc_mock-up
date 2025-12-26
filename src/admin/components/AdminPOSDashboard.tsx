@@ -1,5 +1,6 @@
 import { EVENTS } from "@/dashboard/data";
 import { useState } from "react";
+import { useLanguage } from "../../context/LanguageContext";
 import { EventInfo } from "./EventInfo";
 import { POSHeader } from "./pos/POSHeader";
 import { POSModeSwitcher, type POSMode } from "./pos/POSModeSwitcher";
@@ -13,6 +14,8 @@ interface AdminPOSDashboardProps {
 
 export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
     const event = EVENTS.find(e => e.id === eventId);
+    
+    const { t } = useLanguage();
 
     const [mode, setMode] = useState<POSMode>("ENTRANCE");
     const [scanStep, setScanStep] = useState<ScanStep>("IDLE");
@@ -65,10 +68,10 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
             <POSHeader eventName={event.name} onBack={onBack} />
 
             <div className="text-[10px] text-zinc-600 font-mono text-center mt-2 mb-2 uppercase tracking-widest">
-                Term: {DEVICE_ID}
+                {t('dashboard.term')}: {DEVICE_ID}
             </div>
 
-            <POSModeSwitcher mode={mode} setMode={setMode} />
+            <POSModeSwitcher mode={mode} setMode={setMode} disabled={scanStep !== "IDLE"} />
 
             <div className="flex-1 flex flex-col px-6 pb-6">
                 <POSStatusCard
