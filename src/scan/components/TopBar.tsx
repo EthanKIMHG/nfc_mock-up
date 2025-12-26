@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CogIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { ScanStatus, ScanMode } from "../types";
+import type { ScanMode, ScanStatus } from "../types";
 
 interface TopBarProps {
     status: ScanStatus;

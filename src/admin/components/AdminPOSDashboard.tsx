@@ -1,9 +1,10 @@
-import { useState } from "react";
 import { EVENTS } from "@/dashboard/data";
+import { useState } from "react";
+import { EventInfo } from "./EventInfo";
 import { POSHeader } from "./pos/POSHeader";
 import { POSModeSwitcher, type POSMode } from "./pos/POSModeSwitcher";
-import { POSStatusCard } from "./pos/POSStatusCard";
 import { POSScanFlow, type ScanStep } from "./pos/POSScanFlow";
+import { POSStatusCard } from "./pos/POSStatusCard";
 
 interface AdminPOSDashboardProps {
     eventId: string;
@@ -76,6 +77,9 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
                     checkedIn={checkedIn}
                     totalAttendees={event.attendees.total}
                 />
+                
+                {(scanStep === "IDLE" || scanStep === "SCANNING") && <EventInfo event={event} />}
+
 
                 <POSScanFlow
                     scanStep={scanStep}

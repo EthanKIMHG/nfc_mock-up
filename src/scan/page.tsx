@@ -1,13 +1,13 @@
+import type { NFTTicket } from "@/types/ticket";
 import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { NFTTicket } from "@/types/ticket";
-import type { ScanStatus, ScanMode } from "./types";
-import { TopBar } from "./components/TopBar";
 import { ModeSwitcher } from "./components/ModeSwitcher";
-import { ScanVisual } from "./components/ScanVisual";
 import { PayloadInspector } from "./components/PayloadInspector";
 import { ResultDrawer } from "./components/ResultDrawer";
+import { ScanVisual } from "./components/ScanVisual";
+import { TopBar } from "./components/TopBar";
+import type { ScanMode, ScanStatus } from "./types";
 
 export default function ScanPage() {
   const [status, setStatus] = useState<ScanStatus>("IDLE");
