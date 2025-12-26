@@ -21,6 +21,7 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
     const [scanStep, setScanStep] = useState<ScanStep>("IDLE");
     const [scannedUser, setScannedUser] = useState<{ name: string; type: string } | null>(null);
     const [checkedIn, setCheckedIn] = useState(event?.attendees.checkedIn || 0);
+    const [shouldFailNext, setShouldFailNext] = useState(false);
 
     // Simulated Data
     const DEVICE_ID = "DEV-POS-082";
@@ -42,7 +43,8 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
         console.log("Submitting Payload to Server:", payload);
 
         setTimeout(() => {
-            const success = Math.random() > 0.1;
+            const success = !shouldFailNext;
+            
             if (success) {
                 setScanStep("SUCCESS");
                 if (mode === "ENTRANCE") setCheckedIn(prev => prev + 1);
@@ -56,9 +58,20 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
                 }, 2500);
             } else {
                 setScanStep("ERROR");
-                setTimeout(() => setScanStep("IDLE"), 2500);
+                setTimeout(() => {
+                    setScanStep("IDLE");
+                    setShouldFailNext(false);
+                }, 2500);
             }
         }, 1500);
+    };
+
+    const triggerFailTest = () => {
+        if (scanStep !== "IDLE") return;
+        setShouldFailNext(true);
+        // Start the flow
+        setScanStep("SCANNING");
+        setTimeout(() => setScanStep("SIGNING"), 1500);
     };
 
     if (!event) return <div>Event not found</div>;
@@ -93,6 +106,16 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
                     deviceId={DEVICE_ID}
                 />
             </div>
+
+            {/* Debug / Test Controls */}
+            {scanStep === "IDLE" && (
+                <button 
+                    onClick={triggerFailTest}
+                    className="absolute bottom-4 right-4 z-50 bg-red-500/20 hover:bg-red-500/40 text-red-500 text-[10px] font-bold px-3 py-1 rounded-full border border-red-500/30 transition-colors"
+                >
+                    TEST FAIL
+                </button>
+            )}
         </div>
     );
 }
