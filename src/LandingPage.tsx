@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldCheck, Ticket } from "lucide-react";
+import { ArrowRight, LayoutDashboardIcon, ShieldCheck, Ticket } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function LandingPage() {
@@ -49,6 +49,23 @@ export default function LandingPage() {
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-white group-hover:text-[#A3C7D6] transition-colors">Administrator</span>
                             <span className="text-[11px] text-gray-500 font-medium">관리자용 대시보드 및 스캔</span>
+                        </div>
+                    </div>
+                    <ArrowRight size={20} className="text-gray-600 group-hover:text-[#A3C7D6] group-hover:translate-x-1 transition-all" />
+                </div>
+            </Link>
+            {/* Dashboard Card */}
+            
+            <Link to="/dashboard" className="group relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#A3C7D6] to-[#7A98A6] rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
+                <div className="relative bg-[#1A1A1A] border border-white/10 rounded-3xl p-6 flex items-center justify-between hover:bg-[#222] transition-colors group-hover:border-[#A3C7D6]/50">
+                    <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center text-black">
+                            <LayoutDashboardIcon size={28} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xl font-bold text-white group-hover:text-[#A3C7D6] transition-colors">Dashboard</span>
+                            <span className="text-[11px] text-gray-500 font-medium">대시보드로 이동 (데스크톱 뷰 필수)</span>
                         </div>
                     </div>
                     <ArrowRight size={20} className="text-gray-600 group-hover:text-[#A3C7D6] group-hover:translate-x-1 transition-all" />
