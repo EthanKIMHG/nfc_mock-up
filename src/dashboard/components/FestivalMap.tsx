@@ -9,123 +9,139 @@ interface Zone {
 interface FestivalMapProps {
     eventId: string;
     zones: Zone[];
+    onZoneClick?: (zoneName: string) => void;
+    selectedZoneName?: string;
 }
 
-export function FestivalMap({ eventId, zones }: FestivalMapProps) {
+export function FestivalMap({ eventId, zones, onZoneClick, selectedZoneName }: FestivalMapProps) {
     const { t } = useLanguage();
+
+    // Color Logic Helper
+    const getColor = (pct: number) => {
+        if (pct > 80) return "#ef4444"; // Red
+        if (pct > 60) return "#f97316"; // Orange
+        if (pct > 40) return "#eab308"; // Yellow
+        return "#22c55e"; // Green
+    };
 
     // 1. NEON NIGHTS (Stadium Layout)
     if (eventId === "EVT-2026-001") {
         return (
-            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl">
+            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl select-none">
                 {/* Stadium Base */}
                 <ellipse cx="400" cy="300" rx="350" ry="250" stroke="rgba(255,255,255,0.1)" fill="none" strokeWidth="2" strokeDasharray="10 10" />
 
-                {/* Main Stage (Top) */}
+                {/* Main Stage (Top) -> Index 0 */}
                 <ZonePath
                     d="M 250 150 Q 400 80 550 150 L 520 250 Q 400 280 280 250 Z"
-                    color="#A855F7"
-                    label={t('zone.main_stage')}
-                    zones={zones}
-                    match="Main"
+                    zone={zones[0]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[0]?.name || "")}
+                    isSelected={selectedZoneName === zones[0]?.name}
+                    label={zones[0]?.name || t('zone.main_stage')}
                 />
 
-                {/* Food Court (Right Arc) */}
+                {/* Food Court (Right Arc) -> Index 1 */}
                 <ZonePath
                     d="M 600 200 Q 700 300 600 400 L 550 350 Q 620 300 550 250 Z"
-                    color="#F97316"
-                    label={t('zone.food_court')}
-                    zones={zones}
-                    match="Food"
+                    zone={zones[1]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[1]?.name || "")}
+                    isSelected={selectedZoneName === zones[1]?.name}
+                    label={zones[1]?.name || t('zone.food_court')}
                 />
 
-                {/* Chill Zone (Left Arc) */}
+                {/* Chill Zone (Left Arc) -> Index 3 (based on data.ts structure) */}
                 <ZonePath
                     d="M 200 200 Q 100 300 200 400 L 250 350 Q 180 300 250 250 Z"
-                    color="#22C55E"
-                    label={t('zone.chill_zone')}
-                    zones={zones}
-                    match="Chill"
+                    zone={zones[3]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[3]?.name || "")}
+                    isSelected={selectedZoneName === zones[3]?.name}
+                    label={zones[3]?.name || t('zone.chill_zone')}
                 />
 
-                {/* Merch Store (Bottom) */}
+                {/* Merch Store (Bottom) -> Index 2 */}
                 <ZonePath
                     d="M 300 450 Q 400 500 500 450 L 500 520 Q 400 550 300 520 Z"
-                    color="#3B82F6"
-                    label={t('zone.merch_store')}
-                    zones={zones}
-                    match="Merch"
+                    zone={zones[2]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[2]?.name || "")}
+                    isSelected={selectedZoneName === zones[2]?.name}
+                    label={zones[2]?.name || t('zone.merch_store')}
                 />
             </svg>
         );
     }
 
-    // 2. GLOBAL GAME CON (Convention Center Layout - BEXCO)
+    // 2. GLOBAL GAME CON (Convention Center Layout)
     if (eventId === "EVT-2026-002") {
         return (
-            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl">
-                {/* Building Outline */}
+            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl select-none">
                 <rect x="50" y="50" width="700" height="500" rx="20" stroke="rgba(255,255,255,0.1)" fill="none" strokeWidth="2" />
 
-                {/* Demo Zone A (Large Hall Left) */}
+                {/* Demo Zone (Left) -> Index 2 (VR/Demo) */}
                 <ZonePath
                     d="M 80 80 L 380 80 L 380 380 L 80 380 Z"
-                    color="#3B82F6"
-                    label={t('zone.demo_zone')}
-                    zones={zones}
-                    match="Demo"
+                    zone={zones[2]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[2]?.name || "")}
+                    isSelected={selectedZoneName === zones[2]?.name}
+                    label={zones[2]?.name || t('zone.demo_zone')}
                 />
 
-                {/* E-Sports Arena (Large Hall Right) */}
+                {/* E-Sports Arena (Right) -> Index 0 */}
                 <ZonePath
                     d="M 420 80 L 720 80 L 720 380 L 420 380 Z"
-                    color="#EF4444"
-                    label={t('zone.esports')}
-                    zones={zones}
-                    match="Arena"
+                    zone={zones[0]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[0]?.name || "")}
+                    isSelected={selectedZoneName === zones[0]?.name}
+                    label={zones[0]?.name || t('zone.esports')}
                 />
 
-                {/* Indie Corner (Bottom Strip) */}
+                {/* Indie Corner (Bottom) -> Index 1 */}
                 <ZonePath
                     d="M 80 420 L 720 420 L 720 520 L 80 520 Z"
-                    color="#EAB308"
-                    label={t('zone.indie')}
-                    zones={zones}
-                    match="Indie"
+                    zone={zones[1]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[1]?.name || "")}
+                    isSelected={selectedZoneName === zones[1]?.name}
+                    label={zones[1]?.name || t('zone.indie')}
                 />
             </svg>
         );
     }
 
-    // 3. SPRING JAZZ PICNIC (Park Layout - Yeouido)
+    // 3. SPRING JAZZ PICNIC (Park Layout)
     if (eventId === "EVT-2026-003") {
-        return (
-            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl">
-                {/* River Curve (Han River) */}
+         return (
+            <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl select-none">
                 <path d="M 0 100 Q 400 0 800 100" stroke="#3B82F6" strokeWidth="4" fill="none" opacity="0.3" />
 
-                {/* Picnic Grass (Large Organic Area) */}
+                {/* Picnic Grass -> Index 0 */}
                 <ZonePath
                     d="M 100 200 Q 400 150 700 200 Q 750 400 600 500 Q 400 550 200 500 Q 50 400 100 200 Z"
-                    color="#4ADE80"
-                    label={t('zone.picnic')}
-                    zones={zones}
-                    match="Picnic"
+                    zone={zones[0]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[0]?.name || "")}
+                    isSelected={selectedZoneName === zones[0]?.name}
+                    label={zones[0]?.name || t('zone.picnic')}
                 />
 
-                {/* Food Trucks (Roadside) */}
+                {/* Food Trucks -> Index 2 (Wine/Food) */}
                 <ZonePath
                     d="M 150 520 L 650 520 L 650 580 L 150 580 Z"
-                    color="#F97316"
-                    label={t('zone.food_trucks')}
-                    zones={zones}
-                    match="Food"
+                    zone={zones[2]}
+                    getColor={getColor}
+                    onClick={() => onZoneClick?.(zones[2]?.name || "")}
+                    isSelected={selectedZoneName === zones[2]?.name}
+                    label={zones[2]?.name || t('zone.food_trucks')}
                 />
             </svg>
         );
     }
 
-    // Fallback (Generic)
     return (
         <svg viewBox="0 0 800 600" className="w-full h-full max-w-[800px] drop-shadow-2xl">
             <rect x="100" y="100" width="600" height="400" stroke="white" fill="none" opacity="0.1" />
@@ -134,36 +150,39 @@ export function FestivalMap({ eventId, zones }: FestivalMapProps) {
     );
 }
 
-// Helper Sub-component for individual zones
-function ZonePath({ d, color, label, zones, match }: { d: string, color: string, label: string, zones: Zone[], match: string }) {
-    const zone = zones.find(z => z.name.includes(match)) || { percentage: 0 };
-
-    // Opacity calculation: 0% -> 0.2 (min visibility), 100% -> 0.8 (strong visibility)
-    // Formula: 0.2 + (percentage / 100) * 0.6
-    const opacityHex = Math.min(255, Math.floor(255 * (0.2 + (zone.percentage / 100) * 0.6))).toString(16).padStart(2, '0');
+function ZonePath({ d, zone, getColor, onClick, isSelected, label }: any) {
+    if (!zone) return null; // Safe guard
+    const color = getColor(zone.percentage);
 
     return (
-        <g className="group transition-all duration-500">
+        <g 
+            className="group transition-all duration-300 cursor-pointer" 
+            onClick={onClick}
+            style={{ opacity: isSelected ? 1 : 0.8 }}
+        >
             <motion.path
                 d={d}
-                className="cursor-pointer"
-                initial={{ fill: `${color}10` }}
+                initial={{ fill: `${color}20` }}
                 animate={{
-                    fill: `${color}${opacityHex}`,
-                    filter: `drop-shadow(0 0 ${zone.percentage / 4}px ${color}80)`
+                    fill: `${color}40`,
+                    filter: isSelected 
+                        ? `drop-shadow(0 0 15px ${color})` 
+                        : `drop-shadow(0 0 ${zone.percentage / 10}px ${color}40)`,
+                    strokeWidth: isSelected ? 3 : 1
                 }}
-                stroke={color}
-                strokeWidth="2"
+                stroke={isSelected ? "#FFF" : color}
+                whileHover={{ scale: 1.02, strokeWidth: 2, fill: `${color}60` }}
             />
-            {/* Label Background for readability */}
+            {/* Label Background */}
             <rect
                 x={getCenter(d).x - 40}
                 y={getCenter(d).y - 15}
                 width="80"
                 height="30"
                 rx="4"
-                fill="rgba(0,0,0,0.6)"
-                className="pointer-events-none"
+                fill="rgba(0,0,0,0.7)"
+                stroke={isSelected ? color : "transparent"}
+                className="pointer-events-none transition-colors"
             />
             <text
                 x={getCenter(d).x}

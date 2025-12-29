@@ -236,6 +236,38 @@ const ANALYTICS_DATA = {
             trafficFlow: [{ time: "10:00", count: 150 }, { time: "11:00", count: 450 }, { time: "12:00", count: 1200 }, { time: "13:00", count: 800 }]
         }
     },
+    "EVT-2026-002": {
+        en: {
+            topZones: ["Esports Arena", "Indie Game Zone", "VR Experience", "Retro Arcade"],
+            items: ["Gaming Mouse", "Character Figure", "Steam Gift Card", "Keyboard"]
+        },
+        ko: {
+            topZones: ["e스포츠 아레나", "인디 게임 존", "VR 체험관", "레트로 오락실"],
+            items: ["게이밍 마우스", "캐릭터 피규어", "스팀 기프트 카드", "키보드"]
+        },
+        base: {
+            avgDwellTime: "5h 20m",
+            topZonesPct: [55, 20, 15, 10],
+            recentPurchasesPrices: [85000, 45000, 25000, 120000],
+            trafficFlow: [{ time: "10:00", count: 300 }, { time: "11:00", count: 800 }, { time: "12:00", count: 2500 }]
+        }
+    },
+    "EVT-2026-003": {
+        en: {
+            topZones: ["Picnic Zone", "Acoustic Stage", "Wine Bar", "Lake View"],
+            items: ["Wine Glass", "Cheese Plate", "Picnic Mat", "LP Record"]
+        },
+        ko: {
+            topZones: ["피크닉 존", "어쿠스틱 무대", "와인 바", "호수 전망대"],
+            items: ["와인 잔", "치즈 플레이트", "피크닉 매트", "LP 레코드"]
+        },
+        base: {
+            avgDwellTime: "2h 10m",
+            topZonesPct: [40, 30, 20, 10],
+            recentPurchasesPrices: [12000, 25000, 18000, 45000],
+            trafficFlow: [{ time: "14:00", count: 100 }, { time: "15:00", count: 300 }, { time: "16:00", count: 500 }]
+        }
+    },
     "EVT-2025-001": {
         en: {
             topZones: ["Beer Garden", "Food Trucks", "Picnic Area"],
@@ -280,28 +312,70 @@ const ANALYTICS_DATA = {
 };
 
 export const getAnalytics = (eventId: string, lang: Language): AnalyticsData | null => {
+    // Try to get specific data
     const data = ANALYTICS_DATA[eventId as keyof typeof ANALYTICS_DATA];
-    if (!data) return null;
 
-    const localized = lang === 'ko' ? data.ko : data.en;
-    const base = data.base;
+    // Default Generics if missing
+    const defaultTopZones = lang === 'ko' ? ["메인 스테이지", "푸드 코트", "휴식 존", "입구"] : ["Main Stage", "Food Court", "Chill Zone", "Entrance"];
+    const defaultItems = lang === 'ko' ? ["기본 티켓", "음료 쿠폰", "간식 세트"] : ["Standard Ticket", "Drink Token", "Snack Set"];
+
+    // Define a common interface for localized data to satisfy TS
+    interface LocalizedData {
+        topZones: string[];
+        items?: string[];
+        aiInsights?: { title: string; description: string; }[];
+    }
+
+    const localized: LocalizedData = (data && (lang === 'ko' ? data.ko : data.en)) || {
+        topZones: defaultTopZones,
+        items: defaultItems,
+        aiInsights: []
+    };
+
+    // Explicitly type base to allow optional chartData
+    const base = data?.base || {
+        avgDwellTime: "2h 30m",
+        topZonesPct: [40, 30, 20, 10],
+        recentPurchasesPrices: [15000, 8000, 12000],
+        trafficFlow: [{ time: "10:00", count: 100 }, { time: "12:00", count: 300 }],
+        chartData: undefined
+    };
+
+    // Ensure chartData exists (Active events might not have it, but Completed should)
+    // If chartData is missing, generate generic data so it doesn't crash
+    const chartData = base.chartData || {
+        revenueByCategory: [
+            { name: lang === 'ko' ? "티켓" : "Tickets", value: 50000000, color: "bg-blue-500" },
+            { name: lang === 'ko' ? "음식" : "Food", value: 30000000, color: "bg-orange-500" },
+            { name: lang === 'ko' ? "굿즈" : "Merch", value: 20000000, color: "bg-purple-500" }
+        ],
+        beerSales: [
+            { name: "Cass", count: 500, color: "bg-blue-400" },
+            { name: "Terra", count: 400, color: "bg-green-500" },
+            { name: "Kelly", count: 300, color: "bg-amber-400" }
+        ],
+        hourlyTraffic: [
+            { time: "10 AM", count: 100 }, { time: "12 PM", count: 300 }, { time: "2 PM", count: 500 },
+            { time: "4 PM", count: 800 }, { time: "6 PM", count: 600 }, { time: "8 PM", count: 400 }
+        ]
+    };
 
     return {
         eventId,
         avgDwellTime: base.avgDwellTime,
-        topZones: localized.topZones.map((name, i) => ({ name, percentage: base.topZonesPct[i] })),
-        recentPurchases: base.recentPurchasesPrices ? base.recentPurchasesPrices.map((amount, i) => ({
-            id: `TX-${i}`,
-            item: localized.items ? localized.items[i] : 'Unknown',
+        topZones: localized.topZones.map((name, i) => ({ name, percentage: base.topZonesPct[i] || 10 })),
+        recentPurchases: (base.recentPurchasesPrices || [10000]).map((amount, i) => ({
+            id: `TX-${Math.random().toString(36).substr(2, 5)}`,
+            item: localized.items ? localized.items[i % localized.items.length] : (defaultItems[i % defaultItems.length]),
             amount,
             time: "10:00"
-        })) : [],
+        })),
         trafficFlow: base.trafficFlow || [],
         aiInsights: localized.aiInsights?.map((insight, i) => ({
             ...insight,
-            icon: ["users", "beer", "trending"][i] as any
-        })),
-        chartData: base.chartData
+            icon: ["users", "beer", "trending"][i % 3] as any
+        })) || [],
+        chartData
     };
 };
 
