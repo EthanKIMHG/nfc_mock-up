@@ -4,9 +4,12 @@ import AdminPage from "./admin/page";
 import { LanguageProvider } from "./context/LanguageContext";
 import { TicketProvider } from "./context/TicketContext";
 import HistoryPage from "./history/page";
+import EventDetailPage from "./holder/event/page";
+import HolderPage from "./holder/page";
 import ScanPage from "./scan/page";
 
 import DashboardPage from "./dashboard/page";
+import LandingPage from "./LandingPage";
 
 import { useLocation } from "react-router-dom";
 
@@ -36,7 +39,10 @@ function App() {
             <Route path="/dashboard/*" element={<DashboardPage />} />
 
             {/* Mobile App Routes (Restricted Width) */}
-            <Route path="/" element={<Layout><AdminPage /></Layout>} />
+            <Route path="/" element={<Layout><LandingPage /></Layout>} />
+            <Route path="/holder" element={<Layout><HolderPage /></Layout>} />
+            <Route path="/holder/event/:id" element={<Layout><EventDetailPage /></Layout>} />
+            <Route path="/admin" element={<Layout><AdminPage /></Layout>} />
             <Route path="/scan" element={<Layout><ScanPage /></Layout>} />
             <Route path="/history/:id" element={<Layout><HistoryPage /></Layout>} />
           </Routes>
