@@ -12,11 +12,13 @@ interface POSScanFlowProps {
     mode: POSMode;
     onScan: () => void;
     onSignature: () => void;
-    scannedUser: { name: string; type: string } | null;
+    scannedUser: { name: string; type: string; nfcUid: string } | null;
     deviceId: string;
+    errorMessage?: string;
+    currentNfcUid?: string | null;
 }
 
-export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, deviceId }: POSScanFlowProps) {
+export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, deviceId, errorMessage, currentNfcUid }: POSScanFlowProps) {
     const { t } = useLanguage();
 
     return (
@@ -34,6 +36,14 @@ export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, 
                     >
                         <PenTool size={48} className="text-blue-400 mb-4 animate-bounce" />
                         <h3 className="text-2xl font-bold text-white mb-2">{t('scan.signature_required')}</h3>
+
+                        {/* Display NFC UID if available */}
+                        {currentNfcUid && (
+                            <div className="mb-4 px-4 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                                <p className="text-blue-300 font-mono text-sm">NFC: {currentNfcUid}</p>
+                            </div>
+                        )}
+
                         <p className="text-gray-400 text-center px-8 mb-8">{t('scan.signature_guide')}</p>
 
                         <div className="w-64 h-32 bg-zinc-800 rounded-xl border-2 border-dashed border-zinc-600 mb-8 flex items-center justify-center text-zinc-600 font-mono">
@@ -69,7 +79,8 @@ export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, 
                         </motion.div>
                         <h3 className="text-3xl font-black uppercase text-black mb-2 tracking-tight">{scannedUser.type}</h3>
                         <p className="text-black/70 font-bold text-xl">{scannedUser.name}</p>
-                        <p className="text-black/50 font-mono mt-8">{t('scan.verified_blockchain')}</p>
+                        <p className="text-black/50 font-mono mt-2 text-sm">UID: {scannedUser.nfcUid}</p>
+                        <p className="text-black/50 font-mono mt-6">{t('scan.verified_blockchain')}</p>
                     </motion.div>
                 )}
 
@@ -109,8 +120,8 @@ export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, 
                         <div className="flex justify-center mb-2">
                             <AlertCircle size={40} />
                         </div>
-                        <h3 className="text-xl font-bold">{t('scan.access_denied')}</h3>
-                        <p className="text-white/80">{t('scan.invalid_ticket')}</p>
+                        <h3 className="text-xl font-bold">Error</h3>
+                        <p className="text-white/80">{errorMessage || t('scan.invalid_ticket')}</p>
                     </motion.div>
                 )}
             </AnimatePresence>
