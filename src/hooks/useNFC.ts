@@ -85,6 +85,7 @@ export function useNFC() {
         isScanning,
         error,
         serialNumber,
-        isSupported
+        isSupported,
+        ndefRef
     };
 }

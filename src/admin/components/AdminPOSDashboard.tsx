@@ -1,5 +1,5 @@
 import { EVENTS } from "@/dashboard/data";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNFC } from "@/hooks/useNFC";
 import { useLanguage } from "../../context/LanguageContext";
 import { EventInfo } from "./EventInfo";
@@ -7,6 +7,7 @@ import { POSHeader } from "./pos/POSHeader";
 import { POSModeSwitcher, type POSMode } from "./pos/POSModeSwitcher";
 import { POSScanFlow, type ScanStep } from "./pos/POSScanFlow";
 import { POSStatusCard } from "./pos/POSStatusCard";
+import { detectChipType, type ChipType } from "@/utils/nfcUtils";
 
 interface AdminPOSDashboardProps {
     eventId: string;
@@ -24,21 +25,99 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
     const [checkedIn, setCheckedIn] = useState(event?.attendees.checkedIn || 0);
     const [shouldFailNext, setShouldFailNext] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | undefined>();
+    const [detectedType, setDetectedType] = useState<ChipType | null>(null);
+
+    const [pendingTransaction, setPendingTransaction] = useState<{ item: string, price: string } | null>(null);
 
     // Simulated Data
     const DEVICE_ID = "DEV-POS-082";
 
-    const { startScan, stopScan, serialNumber, isSupported } = useNFC();
+    const { startScan, stopScan, serialNumber, isSupported, ndefRef } = useNFC();
+    const isValidatingRef = useRef(false);
 
     const handleScan = async () => {
         if (scanStep !== "IDLE") return;
         setScanStep("SCANNING");
+        isValidatingRef.current = false; // Reset lock
 
         if (isSupported) {
             await startScan({
-                onReading: () => {
-                    stopScan();
-                    setScanStep("SIGNING");
+                onReading: async (uid) => {
+                    // Prevent multiple re-entries while verifying
+                    if (isValidatingRef.current) return;
+                    isValidatingRef.current = true;
+
+                    // Start Validation
+                    setScanStep("VERIFYING");
+
+                    if (ndefRef.current) {
+                        try {
+                            // Add a timeout to prevent infinite hanging
+                            const detectionPromise = detectChipType(uid, ndefRef.current);
+                            const timeoutPromise = new Promise<ChipType>((_, reject) =>
+                                setTimeout(() => reject(new Error("Detection Timeout")), 12000)
+                            );
+
+                            const type = await Promise.race([detectionPromise, timeoutPromise]);
+
+                            setDetectedType(type);
+
+                            if (type === 'TYPE_INVALID') {
+                                stopScan();
+                                setScanStep("ERROR");
+                                setErrorMessage("Invalid Chip (4-byte UID)");
+                                setTimeout(() => {
+                                    setScanStep("IDLE");
+                                    setErrorMessage(undefined);
+                                }, 3000);
+                            } else if (type === 'TYPE_UNKNOWN') {
+                                stopScan();
+                                setScanStep("ERROR");
+                                setErrorMessage("Unknown Chip Error");
+                                setTimeout(() => {
+                                    setScanStep("IDLE");
+                                    setErrorMessage(undefined);
+                                }, 3000);
+                            }
+                            // Success cases
+                            else {
+                                stopScan();
+                                // Calculate Pending Transaction HERE
+                                if (mode === 'PAYMENT') {
+                                    let item = "Unknown Item";
+                                    let price = "0 KRW";
+                                    if (type === 'TYPE_ULTRALIGHT') { item = "Mineral Water"; price = "3,000 KRW"; }
+                                    else if (type === 'TYPE_NTAG213') { item = "Craft Beer (IPA)"; price = "8,000 KRW"; }
+                                    else if (type === 'TYPE_NTAG215') { item = "Limited T-Shirt"; price = "35,000 KRW"; }
+                                    setPendingTransaction({ item, price });
+                                } else {
+                                    setPendingTransaction(null);
+                                }
+                                setScanStep("SIGNING");
+                            }
+
+                        } catch (err: any) {
+                            stopScan();
+                            setScanStep("ERROR");
+                            console.warn("Validation Error:", err);
+                            setErrorMessage(err.message || "Validation Error");
+                            setTimeout(() => {
+                                setScanStep("IDLE");
+                                setErrorMessage(undefined);
+                            }, 3000);
+                        } finally {
+                            isValidatingRef.current = false;
+                        }
+                    } else {
+                        isValidatingRef.current = false;
+                        stopScan();
+                        setScanStep("ERROR");
+                        setErrorMessage("NFC Reader not ready");
+                        setTimeout(() => {
+                            setScanStep("IDLE");
+                            setErrorMessage(undefined);
+                        }, 3000);
+                    }
                 },
                 onError: (err) => {
                     stopScan();
@@ -53,21 +132,54 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
             });
         } else {
             // Fallback for desktop/unsupported devices
-            setTimeout(() => setScanStep("SIGNING"), 5000);
+            setTimeout(() => {
+                const simulatedType = 'TYPE_NTAG215';
+                setDetectedType(simulatedType);
+
+                // Simulate Payment Calc
+                if (mode === 'PAYMENT') {
+                    setPendingTransaction({ item: "Limited T-Shirt", price: "35,000 KRW" });
+                } else {
+                    setPendingTransaction(null);
+                }
+
+                setScanStep("SIGNING");
+            }, 3000);
         }
     };
 
     const handleSignature = () => {
         setScanStep("VERIFYING");
-        const currentNfcUid = serialNumber || "04:A2:3C:91"; // Capture current UID for display
+        const currentNfcUid = serialNumber || "04:A2:3C:91";
+
+        let displayTitle = "Unknown User";
+        let displaySubtitle = "UNKNOWN TYPE";
+
+        if (mode === 'ENTRANCE') {
+            displayTitle = "Kim Min-soo";
+            if (detectedType === 'TYPE_ULTRALIGHT') displaySubtitle = "BASIC TICKET";
+            else if (detectedType === 'TYPE_NTAG213') displaySubtitle = "VIP TICKET";
+            else if (detectedType === 'TYPE_NTAG215') displaySubtitle = "VVIP TICKET";
+            else displaySubtitle = "VIP ACCESS";
+        } else {
+            if (pendingTransaction) {
+                displayTitle = pendingTransaction.item;
+                displaySubtitle = pendingTransaction.price;
+            }
+        }
+
         const payload = {
-            nfc_uid: currentNfcUid, // Use scanned UID or fallback
+            nfc_uid: currentNfcUid,
             device_id: DEVICE_ID,
             timestamp: new Date().toISOString(),
-            signature: "admin_signed_hash"
+            signature: "admin_signed_hash",
+            chip_type: detectedType,
+            mode: mode,
+            item: displayTitle
         };
         console.log("Submitting Payload to Server:", payload);
 
+        // Simulate Server Validation Delay
         setTimeout(() => {
             const success = !shouldFailNext;
 
@@ -75,21 +187,25 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
                 setScanStep("SUCCESS");
                 if (mode === "ENTRANCE") setCheckedIn(prev => prev + 1);
                 setScannedUser({
-                    name: "Kim Min-soo",
-                    type: mode === "ENTRANCE" ? "VIP ACCESS" : "PAYMENT APPROVED",
+                    name: displayTitle,
+                    type: displaySubtitle,
                     nfcUid: currentNfcUid
                 });
                 setTimeout(() => {
                     setScanStep("IDLE");
                     setScannedUser(null);
-                    stopScan(); // Ensure scan is stopped
+                    setDetectedType(null);
+                    setPendingTransaction(null);
+                    stopScan();
                 }, 2500);
             } else {
                 setScanStep("ERROR");
+                setPendingTransaction(null);
                 setTimeout(() => {
                     setScanStep("IDLE");
                     setShouldFailNext(false);
-                    stopScan(); // Ensure scan is stopped
+                    setDetectedType(null);
+                    stopScan();
                 }, 2500);
             }
         }, 1500);
@@ -97,10 +213,16 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
 
     const triggerFailTest = () => {
         if (scanStep !== "IDLE") return;
-        setShouldFailNext(true);
-        // Start the flow
         setScanStep("SCANNING");
-        setTimeout(() => setScanStep("SIGNING"), 1500);
+        // Simulate Invalid Chip
+        setTimeout(() => {
+            setScanStep("ERROR");
+            setErrorMessage("Invalid Chip (4-byte UID)");
+            setTimeout(() => {
+                setScanStep("IDLE");
+                setErrorMessage(undefined);
+            }, 3000);
+        }, 1500);
     };
 
     if (!event) return <div>Event not found</div>;
@@ -135,18 +257,10 @@ export function AdminPOSDashboard({ eventId, onBack }: AdminPOSDashboardProps) {
                     deviceId={DEVICE_ID}
                     errorMessage={errorMessage}
                     currentNfcUid={serialNumber || "04:A2:3C:91"}
+                    pendingTransaction={pendingTransaction}
                 />
             </div>
 
-            {/* Debug / Test Controls */}
-            {scanStep === "IDLE" && (
-                <button
-                    onClick={triggerFailTest}
-                    className="absolute bottom-4 right-4 z-50 bg-red-500/20 hover:bg-red-500/40 text-red-500 text-[10px] font-bold px-3 py-1 rounded-full border border-red-500/30 transition-colors"
-                >
-                    TEST FAIL
-                </button>
-            )}
         </div>
     );
 }

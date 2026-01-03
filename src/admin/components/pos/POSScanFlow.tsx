@@ -16,9 +16,10 @@ interface POSScanFlowProps {
     deviceId: string;
     errorMessage?: string;
     currentNfcUid?: string | null;
+    pendingTransaction?: { item: string; price: string } | null;
 }
 
-export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, deviceId, errorMessage, currentNfcUid }: POSScanFlowProps) {
+export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, deviceId, errorMessage, currentNfcUid, pendingTransaction }: POSScanFlowProps) {
     const { t } = useLanguage();
 
     return (
@@ -32,28 +33,37 @@ export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, 
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/90 rounded-3xl backdrop-blur-md z-20 border border-white/10"
+                        className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/90 rounded-3xl backdrop-blur-md z-20 border border-white/10 space-y-4 py-4"
                     >
-                        <PenTool size={48} className="text-blue-400 mb-4 animate-bounce" />
-                        <h3 className="text-2xl font-bold text-white mb-2">{t('scan.signature_required')}</h3>
+                        <PenTool size={48} className="text-blue-400 mt-4 animate-bounce" />
+                        <h3 className="text-xl font-bold text-white">{t('scan.signature_required')}</h3>
 
-                        {/* Display NFC UID if available */}
+                        {/* Display Payment Details if available */}
+                        {mode === 'PAYMENT' && pendingTransaction && (
+                            <div className="text-center">
+                                <p className="text-zinc-500 text-xs font-bold uppercase mb-2 tracking-widest">Confirm Purchase</p>
+                                <h4 className="text-2xl font-bold text-white mb-2 tracking-tight">{pendingTransaction.item}</h4>
+                                <p className="text-3xl font-black text-blue-400 tracking-tighter">{pendingTransaction.price}</p>
+                            </div>
+                        )}
+
+                        {/* Always Display NFC UID */}
                         {currentNfcUid && (
-                            <div className="mb-4 px-4 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                            <div className=" px-4 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-full">
                                 <p className="text-blue-300 font-mono text-sm">NFC: {currentNfcUid}</p>
                             </div>
                         )}
 
-                        <p className="text-gray-400 text-center px-8 mb-8">{t('scan.signature_guide')}</p>
+                        <p className="text-gray-400 text-center px-8 ">{t('scan.signature_guide')}</p>
 
-                        <div className="w-64 h-32 bg-zinc-800 rounded-xl border-2 border-dashed border-zinc-600 mb-8 flex items-center justify-center text-zinc-600 font-mono">
+                        <div className="w-64 h-64 bg-zinc-800 rounded-xl border-2 border-dashed border-zinc-600 mb-8 flex items-center justify-center text-zinc-600 font-mono">
                             {t('scan.signature_pad')}
                         </div>
 
                         <Button
                             onClick={onSignature}
                             size="lg"
-                            className="w-full max-w-xs bg-blue-500 hover:bg-blue-400 font-bold rounded-full h-14 text-lg shadow-lg"
+                            className="w-64 max-w-xs bg-blue-500 hover:bg-blue-400 font-bold rounded-full h-14 text-lg shadow-lg"
                         >
                             {t('scan.confirm_signature')}
                         </Button>
@@ -97,12 +107,8 @@ export function POSScanFlow({ scanStep, mode, onScan, onSignature, scannedUser, 
                         <h3 className="text-xl font-bold text-white">{t('scan.verifying_credentials')}</h3>
                         <div className="mt-4 flex flex-col gap-1 items-center">
                             <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                <span>DEVICE: {deviceId}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
                                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse delay-75" />
-                                <span>NFC: 04:A2:3C:91</span>
+                                <span>NFC: {currentNfcUid || "Scanning..."}</span>
                             </div>
                         </div>
                     </motion.div>
